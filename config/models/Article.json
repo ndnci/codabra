@@ -1,0 +1,15 @@
+{
+    "name": "Article",
+    "fields": {
+        "title": "string",
+        "body": {
+            "type": "string",
+            "required": false
+        },
+        "published": {
+            "type": "boolean",
+            "default": false
+        },
+        "createdAt": "date_now"
+    }
+}

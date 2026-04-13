@@ -1,0 +1,11 @@
+{
+    "name": "UserListPage",
+    "path": "/users",
+    "root": {
+        "type": "container",
+        "children": [
+            { "type": "heading", "label": "Users" },
+            { "type": "table", "model": "User" }
+        ]
+    }
+}

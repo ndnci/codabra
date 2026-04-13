@@ -1,0 +1,29 @@
+{
+    "name": "@codabra/core",
+    "version": "0.1.0",
+    "description": "Core config loading, parsing, validation, and compilation logic for Codabra",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "src/schemas"
+    ],
+    "scripts": {
+        "build": "tsup src/index.ts --format cjs --dts --clean",
+        "dev": "tsup src/index.ts --format cjs --dts --watch",
+        "typecheck": "tsc --noEmit",
+        "clean": "rm -rf dist"
+    },
+    "devDependencies": {
+        "tsup": "^8.0.0",
+        "typescript": "^5.4.0",
+        "@types/node": "^20.12.0"
+    },
+    "exports": {
+        ".": {
+            "require": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        },
+        "./schemas/*": "./src/schemas/*"
+    }
+}

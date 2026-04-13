@@ -1,0 +1,26 @@
+{
+    "name": "codabra",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Codabra – configuration-driven application generator",
+    "scripts": {
+        "build": "turbo run build",
+        "dev": "turbo run dev",
+        "lint": "turbo run lint",
+        "typecheck": "turbo run typecheck",
+        "clean": "turbo run clean && rm -rf node_modules",
+        "codabra": "codabra",
+        "generate": "codabra generate",
+        "validate": "codabra validate"
+    },
+    "devDependencies": {
+        "@codabra/cli": "workspace:*",
+        "@types/node": "^20.12.0",
+        "turbo": "^2.0.0",
+        "typescript": "^5.4.0"
+    },
+    "packageManager": "pnpm@9.0.0",
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

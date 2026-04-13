@@ -1,0 +1,121 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://codabra.dev/schemas/route.schema.json",
+    "title": "Codabra Route Definitions",
+    "description": "Defines API routes in Codabra. Can be an array of routes or an object with a 'routes' array.",
+    "oneOf": [
+        {
+            "type": "array",
+            "items": { "$ref": "#/definitions/RouteDefinition" },
+            "description": "Array of route definitions (legacy format)."
+        },
+        {
+            "type": "object",
+            "properties": {
+                "$schema": { "type": "string" },
+                "routes": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/RouteDefinition" }
+                }
+            },
+            "required": ["routes"],
+            "additionalProperties": false
+        }
+    ],
+    "definitions": {
+        "HttpMethod": {
+            "type": "string",
+            "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        },
+        "ValidationRule": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "enum": ["notEmpty", "isEmail", "isUUID"]
+                },
+                {
+                    "type": "object",
+                    "required": ["rule"],
+                    "properties": {
+                        "rule": {
+                            "type": "string",
+                            "enum": ["notEmpty", "isEmail", "isUUID", "minLength", "maxLength"]
+                        },
+                        "value": { "oneOf": [{ "type": "string" }, { "type": "number" }] },
+                        "message": { "type": "string" }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "RouteParam": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "description": "Shorthand: just a type string (e.g. 'string', 'uuid')."
+                },
+                {
+                    "type": "object",
+                    "required": ["type"],
+                    "additionalProperties": false,
+                    "properties": {
+                        "type": { "type": "string" },
+                        "required": { "type": "boolean", "default": true },
+                        "validation": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/ValidationRule" }
+                        }
+                    }
+                }
+            ]
+        },
+        "RouteDefinition": {
+            "type": "object",
+            "required": ["method", "path"],
+            "additionalProperties": false,
+            "properties": {
+                "method": {
+                    "$ref": "#/definitions/HttpMethod",
+                    "description": "HTTP method."
+                },
+                "path": {
+                    "type": "string",
+                    "description": "URL path, e.g. '/api/users' or '/api/users/:id'.",
+                    "pattern": "^/"
+                },
+                "params": {
+                    "type": "object",
+                    "description": "URL path parameters (e.g. { id: 'uuid' }).",
+                    "additionalProperties": { "$ref": "#/definitions/RouteParam" }
+                },
+                "body": {
+                    "type": "object",
+                    "description": "Request body fields (for POST/PUT/PATCH).",
+                    "additionalProperties": { "$ref": "#/definitions/RouteParam" }
+                },
+                "response": {
+                    "type": "string",
+                    "description": "Model name or 'Model[]' for the expected response.",
+                    "examples": ["User", "User[]", "Article"]
+                },
+                "redirect": {
+                    "type": "string",
+                    "description": "Redirect the request to another path."
+                },
+                "function": {
+                    "type": "string",
+                    "description": "Name of a function to call instead of a direct ORM query."
+                },
+                "auth": {
+                    "type": "boolean",
+                    "description": "Whether authentication is required.",
+                    "default": false
+                },
+                "voter": {
+                    "type": "string",
+                    "description": "Name of a voter to check authorization."
+                }
+            }
+        }
+    }
+}

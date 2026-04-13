@@ -1,0 +1,28 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "config/models/*.json"
+            ],
+            "url": "./.codabra/schemas/model.schema.json"
+        },
+        {
+            "fileMatch": [
+                "config/routes/*.json"
+            ],
+            "url": "./.codabra/schemas/route.schema.json"
+        },
+        {
+            "fileMatch": [
+                "config/views/*.json"
+            ],
+            "url": "./.codabra/schemas/view.schema.json"
+        },
+        {
+            "fileMatch": [
+                "codabra.json"
+            ],
+            "url": "./node_modules/@codabra/core/src/schemas/codabra.schema.json"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "name": "LoginPage",
+    "path": "/login",
+    "root": {
+        "type": "form",
+        "fields": [
+            { "type": "heading", "label": "Sign in to your account" },
+            { "type": "email", "id": "email", "label": "Email address" },
+            { "type": "password", "id": "password", "label": "Password" },
+            { "type": "button", "label": "Sign in" }
+        ]
+    }
+}

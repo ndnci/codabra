@@ -1,0 +1,133 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://codabra.dev/schemas/view.schema.json",
+    "title": "Codabra View Definition",
+    "description": "Defines a declarative UI view in Codabra.",
+    "type": "object",
+    "required": ["name", "root"],
+    "additionalProperties": false,
+    "properties": {
+        "$schema": { "type": "string" },
+        "name": {
+            "type": "string",
+            "description": "View name in PascalCase (e.g. 'LoginPage', 'UserList').",
+            "pattern": "^[A-Z][a-zA-Z0-9]*$"
+        },
+        "path": {
+            "type": "string",
+            "description": "URL path for this view (e.g. '/login').",
+            "pattern": "^/"
+        },
+        "root": {
+            "$ref": "#/definitions/ViewComponent",
+            "description": "The root component of this view."
+        }
+    },
+    "definitions": {
+        "ViewComponent": {
+            "type": "object",
+            "required": ["type"],
+            "additionalProperties": true,
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "form",
+                        "list",
+                        "card",
+                        "table",
+                        "input",
+                        "email",
+                        "password",
+                        "select",
+                        "button",
+                        "text",
+                        "container",
+                        "heading",
+                        "flex"
+                    ],
+                    "description": "The component type."
+                },
+                "id": {
+                    "type": "string",
+                    "description": "HTML id / name attribute."
+                },
+                "label": {
+                    "type": "string",
+                    "description": "Display label or placeholder text."
+                },
+                "model": {
+                    "type": "string",
+                    "description": "Model name to bind this component to (PascalCase). Used with list/table/card.",
+                    "pattern": "^[A-Za-z][a-zA-Z0-9]*$"
+                },
+                "route": {
+                    "type": "string",
+                    "description": "Route path to bind this component to."
+                },
+                "fields": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/ViewComponent" },
+                    "description": "Nested field components (used inside form)."
+                },
+                "children": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/ViewComponent" },
+                    "description": "Child components (used inside container, card, flex)."
+                },
+                "props": {
+                    "type": "object",
+                    "description": "Component-type-specific props. For 'flex': direction, alignItems, justifyContent, gap.",
+                    "additionalProperties": true
+                }
+            },
+            "if": {
+                "properties": { "type": { "const": "flex" } },
+                "required": ["type"]
+            },
+            "then": {
+                "properties": {
+                    "props": {
+                        "type": "object",
+                        "description": "Flex layout props. Pass direction, alignItems, justifyContent, and gap here.",
+                        "additionalProperties": false,
+                        "properties": {
+                            "direction": {
+                                "type": "string",
+                                "enum": ["row", "row-reverse", "column", "column-reverse"],
+                                "default": "row",
+                                "description": "CSS flex-direction."
+                            },
+                            "alignItems": {
+                                "type": "string",
+                                "enum": ["flex-start", "flex-end", "center", "baseline", "stretch"],
+                                "default": "stretch",
+                                "description": "CSS align-items."
+                            },
+                            "justifyContent": {
+                                "type": "string",
+                                "enum": [
+                                    "flex-start",
+                                    "flex-end",
+                                    "center",
+                                    "space-between",
+                                    "space-around",
+                                    "space-evenly"
+                                ],
+                                "default": "flex-start",
+                                "description": "CSS justify-content."
+                            },
+                            "gap": {
+                                "oneOf": [
+                                    { "type": "number", "description": "Gap in pixels (e.g. 16 → '16px')." },
+                                    { "type": "string", "description": "Gap as CSS value (e.g. '1rem')." }
+                                ],
+                                "description": "Spacing between flex children."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

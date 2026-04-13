@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://codabra.dev/schemas/codabra.schema.json",
+    "title": "Codabra Project Configuration",
+    "description": "Project-level configuration for a Codabra application.",
+    "type": "object",
+    "required": ["provider", "orm"],
+    "additionalProperties": false,
+    "properties": {
+        "$schema": { "type": "string" },
+        "provider": {
+            "type": "string",
+            "enum": ["nextjs"],
+            "description": "The framework provider to use.",
+            "default": "nextjs"
+        },
+        "orm": {
+            "type": "string",
+            "enum": ["drizzle", "prisma"],
+            "description": "The ORM to use for database access.",
+            "default": "drizzle"
+        }
+    }
+}

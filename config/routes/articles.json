@@ -1,0 +1,29 @@
+[
+    {
+        "method": "GET",
+        "path": "/api/articles",
+        "response": "Article[]"
+    },
+    {
+        "method": "POST",
+        "path": "/api/articles",
+        "body": {
+            "title": { "type": "string", "required": true, "validation": ["notEmpty"] },
+            "body": { "type": "string", "required": false }
+        },
+        "auth": true,
+        "response": "Article"
+    },
+    {
+        "method": "GET",
+        "path": "/api/articles/:id",
+        "params": { "id": "uuid" },
+        "response": "Article"
+    },
+    {
+        "method": "DELETE",
+        "path": "/api/articles/:id",
+        "params": { "id": "uuid" },
+        "auth": true
+    }
+]

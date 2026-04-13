@@ -1,0 +1,127 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://codabra.dev/schemas/model.schema.json",
+    "title": "Codabra Model Definition",
+    "description": "Defines a data model in Codabra.",
+    "type": "object",
+    "required": ["name", "fields"],
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
+        },
+        "name": {
+            "type": "string",
+            "description": "Model name in PascalCase (e.g. 'User', 'Article').",
+            "pattern": "^[A-Z][a-zA-Z0-9]*$"
+        },
+        "fields": {
+            "type": "object",
+            "description": "Map of field names to their type definitions.",
+            "additionalProperties": {
+                "$ref": "#/definitions/FieldShorthand"
+            }
+        }
+    },
+    "definitions": {
+        "PrimitiveFieldType": {
+            "type": "string",
+            "enum": ["string", "number", "boolean", "date", "date_now", "uuid"],
+            "description": "A primitive Codabra field type."
+        },
+        "FieldShorthand": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/PrimitiveFieldType",
+                    "description": "Shorthand: just a type string."
+                },
+                {
+                    "$ref": "#/definitions/ModelField",
+                    "description": "Full field definition with optional metadata."
+                }
+            ]
+        },
+        "ValidationRule": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "enum": ["notEmpty", "isEmail", "isUUID"],
+                    "description": "Simple validation rule (no value required)."
+                },
+                {
+                    "type": "object",
+                    "required": ["rule"],
+                    "properties": {
+                        "rule": {
+                            "type": "string",
+                            "enum": ["notEmpty", "isEmail", "isUUID", "minLength", "maxLength"],
+                            "description": "The validation rule name."
+                        },
+                        "value": {
+                            "oneOf": [{ "type": "string" }, { "type": "number" }],
+                            "description": "Optional rule parameter (e.g. minimum length value)."
+                        },
+                        "message": {
+                            "type": "string",
+                            "description": "Custom error message."
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "RelationDef": {
+            "type": "object",
+            "required": ["model", "type"],
+            "additionalProperties": false,
+            "properties": {
+                "model": {
+                    "type": "string",
+                    "description": "Target model name in PascalCase.",
+                    "pattern": "^[A-Z][a-zA-Z0-9]*$"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["one-to-one", "one-to-many", "many-to-many"],
+                    "description": "The relation type."
+                }
+            }
+        },
+        "ModelField": {
+            "type": "object",
+            "required": ["type"],
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "oneOf": [
+                        { "$ref": "#/definitions/PrimitiveFieldType" },
+                        {
+                            "type": "string",
+                            "description": "Reference to another model name (PascalCase).",
+                            "pattern": "^[A-Z][a-zA-Z0-9]*$"
+                        }
+                    ]
+                },
+                "required": {
+                    "type": "boolean",
+                    "description": "Whether the field is required. Defaults to true.",
+                    "default": true
+                },
+                "default": {
+                    "oneOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }],
+                    "description": "Default value for the field."
+                },
+                "unique": {
+                    "type": "boolean",
+                    "description": "Whether the field must be unique.",
+                    "default": false
+                },
+                "relation": {
+                    "$ref": "#/definitions/RelationDef",
+                    "description": "Relation definition (when type is another model name)."
+                }
+            }
+        }
+    }
+}
