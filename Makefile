@@ -1,4 +1,4 @@
-.PHONY: build dev typecheck clean npm-publish npm-publish-alpha help
+.PHONY: build dev typecheck clean npm-publish npm-publish-alpha npm-publish-beta npm-publish-rc help
 
 # ── Variables ─────────────────────────────────────────────────────────────────
 PACKAGE := @ndnci/codabra
@@ -27,6 +27,14 @@ npm-publish:    ## Build and publish $(PACKAGE) as stable (tag: latest)
 npm-publish-alpha: ## Build and publish $(PACKAGE) as pre-release (tag: alpha)
 	pnpm turbo build
 	pnpm $(FILTER) publish --access public --provenance --no-git-checks --tag alpha
+
+npm-publish-beta:  ## Build and publish $(PACKAGE) as pre-release (tag: beta)
+	pnpm turbo build
+	pnpm $(FILTER) publish --access public --provenance --no-git-checks --tag beta
+
+npm-publish-rc:    ## Build and publish $(PACKAGE) as release candidate (tag: rc)
+	pnpm turbo build
+	pnpm $(FILTER) publish --access public --provenance --no-git-checks --tag rc
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 
