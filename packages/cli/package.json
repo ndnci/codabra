@@ -1,5 +1,5 @@
 {
-    "name": "@codabra/cli",
+    "name": "@ndnci/codabra",
     "version": "0.1.0",
     "description": "Codabra CLI — generate and orchestrate applications from config files",
     "main": "./dist/index.js",

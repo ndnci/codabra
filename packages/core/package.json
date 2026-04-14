@@ -1,6 +1,7 @@
 {
     "name": "@codabra/core",
     "version": "0.1.0",
+    "private": true,
     "description": "Core config loading, parsing, validation, and compilation logic for Codabra",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",

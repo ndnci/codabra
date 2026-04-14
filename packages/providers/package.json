@@ -1,6 +1,7 @@
 {
     "name": "@codabra/providers",
     "version": "0.1.0",
+    "private": true,
     "description": "Framework providers for Codabra (Next.js, and future providers)",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",

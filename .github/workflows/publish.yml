@@ -22,7 +22,7 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version: 22
                   cache: pnpm
                   registry-url: https://registry.npmjs.org
 
@@ -32,17 +32,11 @@ jobs:
             - name: Build packages
               run: pnpm turbo build
 
-            - name: Publish @codabra/core
-              run: pnpm --filter @codabra/core publish --access public --no-git-checks
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-            - name: Publish @codabra/providers
-              run: pnpm --filter @codabra/providers publish --access public --no-git-checks
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-            - name: Publish @codabra/cli
-              run: pnpm --filter @codabra/cli publish --access public --no-git-checks
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - name: Publish @ndnci/codabra
+              run: |
+                  if [[ "${{ github.ref_name }}" == *"-"* ]]; then
+                    TAG="--tag alpha"
+                  else
+                    TAG=""
+                  fi
+                  pnpm --filter @ndnci/codabra publish --access public --provenance --no-git-checks $TAG

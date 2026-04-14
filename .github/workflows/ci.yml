@@ -20,7 +20,7 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version: 22
                   cache: pnpm
 
             - name: Install dependencies
@@ -30,4 +30,4 @@ jobs:
               run: pnpm turbo build
 
             - name: Type-check packages
-              run: pnpm --filter '@codabra/*' exec tsc --noEmit
+              run: pnpm --filter './packages/*' exec tsc --noEmit
