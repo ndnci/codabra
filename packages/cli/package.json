@@ -1,6 +1,6 @@
 {
     "name": "@ndnci/codabra",
-    "version": "0.1.0",
+    "version": "0.1.0-alpha.1",
     "description": "Codabra CLI — generate and orchestrate applications from config files",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
