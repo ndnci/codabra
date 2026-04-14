@@ -8,12 +8,13 @@ import { findConfigDir, findAppDir, logSuccess, logError, logWarn, logInfo } fro
 export interface GenerateOptions {
     provider?: string;
     orm?: string;
+    database?: string;
     config?: string;
     appDir?: string;
 }
 
 /** Reads codabra.json from the project root (cwd) if it exists */
-function readCodabraJson(cwd: string): { provider?: string; orm?: string } {
+function readCodabraJson(cwd: string): { provider?: string; orm?: string; database?: string } {
     const filePath = path.join(cwd, "codabra.json");
     if (!fs.existsSync(filePath)) return {};
     try {
@@ -22,6 +23,7 @@ function readCodabraJson(cwd: string): { provider?: string; orm?: string } {
         return {
             provider: typeof parsed.provider === "string" ? parsed.provider : undefined,
             orm: typeof parsed.orm === "string" ? parsed.orm : undefined,
+            database: typeof parsed.database === "string" ? parsed.database : undefined,
         };
     } catch {
         return {};
@@ -82,6 +84,7 @@ export async function generateCommand(opts: GenerateOptions = {}): Promise<boole
     const codabraConfig = readCodabraJson(cwd);
     const providerName = opts.provider ?? codabraConfig.provider ?? "nextjs";
     const ormName = opts.orm ?? codabraConfig.orm ?? "drizzle";
+    const database = opts.database ?? codabraConfig.database ?? "sqlite";
 
     // ── Locate config dir ─────────────────────────
     const configDir = opts.config ?? findConfigDir();
@@ -95,6 +98,7 @@ export async function generateCommand(opts: GenerateOptions = {}): Promise<boole
     const appDir = opts.appDir ?? findAppDir(process.cwd(), providerName);
     logInfo(`Target app directory: ${appDir}`);
     logInfo(`ORM: ${ormName}`);
+    logInfo(`Database: ${database}`);
 
     // ── Load config ───────────────────────────────
     const loader = new JSONLoader();
@@ -120,7 +124,7 @@ export async function generateCommand(opts: GenerateOptions = {}): Promise<boole
     }
 
     const spinner = ora("Generating application files…").start();
-    const result = await provider.generate(config, appDir, { orm: ormName });
+    const result = await provider.generate(config, appDir, { orm: ormName, database });
 
     if (result.errors.length > 0) {
         spinner.warn("Generation completed with errors:");

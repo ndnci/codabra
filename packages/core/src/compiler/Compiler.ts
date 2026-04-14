@@ -17,8 +17,10 @@ export interface CompilerOptions {
     appDir: string;
     /** Whether to throw on validation errors or just warn */
     strict?: boolean;
-    /** ORM adapter to use. Defaults to Drizzle (SQLite). */
+    /** ORM adapter to use (name string or pre-built adapter instance). */
     orm?: OrmAdapter | string;
+    /** Database dialect to use (e.g. "sqlite", "postgresql", "mysql"). */
+    database: string;
 }
 
 export interface CompilerResult {
@@ -55,9 +57,9 @@ export class Compiler {
     constructor(opts: CompilerOptions) {
         let orm: OrmAdapter;
         if (!opts.orm) {
-            orm = getOrmAdapter("drizzle");
+            orm = getOrmAdapter("drizzle", opts.database);
         } else if (typeof opts.orm === "string") {
-            orm = getOrmAdapter(opts.orm);
+            orm = getOrmAdapter(opts.orm, opts.database);
         } else {
             orm = opts.orm;
         }

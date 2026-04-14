@@ -20,7 +20,7 @@ export interface Provider {
      * @param appDir   Absolute path to the target app directory
      * @param options  Optional generation options (e.g. ORM choice)
      */
-    generate(config: ConfigSet, appDir: string, options?: { orm?: string }): Promise<CompilerResult>;
+    generate(config: ConfigSet, appDir: string, options?: { orm?: string; database?: string }): Promise<CompilerResult>;
 
     /**
      * Start the framework dev server inside the target app directory.

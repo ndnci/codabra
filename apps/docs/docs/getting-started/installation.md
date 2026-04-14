@@ -18,9 +18,11 @@ npx create-codabra@latest my-app
 This will:
 
 1. Ask you to choose a provider (currently: Next.js)
-2. Scaffold a Turborepo monorepo
-3. Initialise the framework app
-4. Create example config files
+2. Ask you to choose an ORM (Drizzle or Prisma)
+3. Ask you to choose a database (SQLite, PostgreSQL, or MySQL)
+4. Scaffold a Turborepo monorepo
+5. Initialise the framework app
+6. Create example config files
 
 ## Install in an existing project
 

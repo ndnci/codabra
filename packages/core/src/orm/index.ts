@@ -1,4 +1,10 @@
 import type { ModelDefinition } from "../types";
+import type { DatabaseDialectEntry } from "./dialects";
+import { sqlite, postgresql, mysql } from "./dialects";
+import { DrizzleAdapter } from "./drizzle";
+import { PrismaAdapter } from "./prisma";
+
+export type { DatabaseDialectEntry };
 
 // ─────────────────────────────────────────────
 // ORM Adapter – Strategy Pattern
@@ -95,32 +101,35 @@ export interface OrmAdapter {
 export interface OrmRegistryEntry {
     name: string;
     label: string;
-    create(): OrmAdapter;
-}
-
-/** Import lazily to avoid circular deps */
-function loadPrisma(): OrmAdapter {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return new (require("./prisma").PrismaAdapter)();
-}
-
-function loadDrizzle(): OrmAdapter {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return new (require("./drizzle").DrizzleAdapter)();
+    supportedDatabases: DatabaseDialectEntry[];
+    defaultDatabase: string;
+    create(database: string): OrmAdapter;
 }
 
 export const ormRegistry: OrmRegistryEntry[] = [
-    { name: "drizzle", label: "Drizzle ORM (SQLite)", create: loadDrizzle },
-    { name: "prisma", label: "Prisma (SQLite)", create: loadPrisma },
+    {
+        name: "drizzle",
+        label: "Drizzle ORM",
+        supportedDatabases: [sqlite, postgresql, mysql],
+        defaultDatabase: "sqlite",
+        create: (database) => new DrizzleAdapter(database),
+    },
+    {
+        name: "prisma",
+        label: "Prisma",
+        supportedDatabases: [sqlite, postgresql, mysql],
+        defaultDatabase: "sqlite",
+        create: (database) => new PrismaAdapter(database),
+    },
 ];
 
 /**
- * Finds an ORM adapter by name. Throws if not found.
+ * Finds an ORM adapter by name and database. Throws if not found.
  */
-export function getOrmAdapter(name: string): OrmAdapter {
+export function getOrmAdapter(name: string, database: string): OrmAdapter {
     const entry = ormRegistry.find((o) => o.name === name);
     if (!entry) {
         throw new Error(`Unknown ORM: "${name}". Available: ${ormRegistry.map((o) => o.name).join(", ")}`);
     }
-    return entry.create();
+    return entry.create(database);
 }

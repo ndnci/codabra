@@ -18,8 +18,17 @@ export class NextjsProviderV16 implements Provider {
     readonly initCommand =
         'npx create-next-app@16.2.3 . --typescript --eslint --tailwind --app --src-dir --import-alias "@/*" --yes';
 
-    async generate(config: ConfigSet, appDir: string, options?: { orm?: string }): Promise<CompilerResult> {
-        const compiler = new Compiler({ appDir, strict: false, orm: options?.orm ?? "drizzle" });
+    async generate(
+        config: ConfigSet,
+        appDir: string,
+        options?: { orm?: string; database?: string },
+    ): Promise<CompilerResult> {
+        const compiler = new Compiler({
+            appDir,
+            strict: false,
+            orm: options?.orm ?? "drizzle",
+            database: options?.database ?? "sqlite",
+        });
         return compiler.compile(config);
     }
 

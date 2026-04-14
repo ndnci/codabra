@@ -160,7 +160,7 @@ function createExampleConfig(projectDir: string): void {
     );
 }
 
-function createCodabraJson(projectDir: string, providerName: string, ormName: string): void {
+function createCodabraJson(projectDir: string, providerName: string, ormName: string, database: string): void {
     writeFile(
         path.join(projectDir, "codabra.json"),
         JSON.stringify(
@@ -168,6 +168,7 @@ function createCodabraJson(projectDir: string, providerName: string, ormName: st
                 $schema: "./node_modules/@codabra/core/schemas/codabra.schema.json",
                 provider: providerName,
                 orm: ormName,
+                database,
             },
             null,
             2,
@@ -248,12 +249,27 @@ async function main(): Promise<void> {
         default: ormRegistry[0]?.name,
     });
 
+    // Choose database
+    const selectedOrm = ormRegistry.find((o) => o.name === ormName)!;
+    const dbChoices = selectedOrm.supportedDatabases.map((d, idx) => ({
+        name: idx === 0 ? `${d.label} (default)` : d.label,
+        value: d.name,
+    }));
+    const database = await select({
+        message: "Choose a database:",
+        choices: dbChoices,
+        default: selectedOrm.defaultDatabase,
+    });
+
     // Confirm
     console.log("");
     console.log(chalk.bold("Project summary:"));
     console.log(`  Name:     ${chalk.cyan(projectName)}`);
     console.log(`  Provider: ${chalk.cyan(provider.label)}`);
-    console.log(`  ORM:      ${chalk.cyan(ormRegistry.find((o) => o.name === ormName)?.label ?? ormName)}`);
+    console.log(`  ORM:      ${chalk.cyan(selectedOrm.label)}`);
+    console.log(
+        `  Database: ${chalk.cyan(selectedOrm.supportedDatabases.find((d) => d.name === database)?.label ?? database)}`,
+    );
     console.log("");
 
     const confirmed = await confirm({ message: "Create project?", default: true });
@@ -276,7 +292,7 @@ async function main(): Promise<void> {
     createTurboJson(projectDir);
     createPnpmWorkspace(projectDir);
     createGitIgnore(projectDir);
-    createCodabraJson(projectDir, providerName, ormName);
+    createCodabraJson(projectDir, providerName, ormName, database);
     createVscodeSettings(projectDir);
     spinner.succeed("Monorepo structure created");
 

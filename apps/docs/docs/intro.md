@@ -23,16 +23,16 @@ Codabra does **not** replace frameworks. It generates code that runs inside them
 
 ## Core concepts
 
-| Concept       | What it is                                                    |
-| ------------- | ------------------------------------------------------------- |
-| **Models**    | Data entities (compile to TypeScript interfaces + ORM schema) |
-| **Routes**    | HTTP endpoints (compile to Next.js API routes)                |
-| **Views**     | Declarative UI (compile to React page components)             |
-| **Functions** | Reusable logic blocks                                         |
-| **Events**    | Lifecycle hooks (e.g. `onUserCreated`)                        |
-| **Voters**    | Authorization rules                                           |
-| **Providers** | Framework adapters (Next.js, future: Remix, Nuxt…)            |
-| **ORMs**      | Database adapters (Drizzle by default, Prisma available)      |
+| Concept       | What it is                                                          |
+| ------------- | ------------------------------------------------------------------- |
+| **Models**    | Data entities (compile to TypeScript interfaces + ORM schema)       |
+| **Routes**    | HTTP endpoints (compile to Next.js API routes)                      |
+| **Views**     | Declarative UI (compile to React page components)                   |
+| **Functions** | Reusable logic blocks                                               |
+| **Events**    | Lifecycle hooks (e.g. `onUserCreated`)                              |
+| **Voters**    | Authorization rules                                                 |
+| **Providers** | Framework adapters (Next.js, future: Remix, Nuxt…)                  |
+| **ORMs**      | Database adapters (Drizzle, Prisma) — choose your database at setup |
 
 ## Design principles
 

@@ -23,15 +23,17 @@ Models define your data entities. Each JSON file in `config/models/` is one mode
 
 ## Field types
 
-| Type        | TypeScript  | ORM type (Drizzle / Prisma)                                      | Notes                    |
-| ----------- | ----------- | ---------------------------------------------------------------- | ------------------------ |
-| `string`    | `string`    | `text` / `String`                                                |                          |
-| `number`    | `number`    | `integer` / `Int`                                                |                          |
-| `boolean`   | `boolean`   | `integer (0/1)` / `Boolean`                                      |                          |
-| `date`      | `Date`      | `integer (epoch ms)` / `DateTime`                                |                          |
-| `date_now`  | `Date`      | `integer.$defaultFn(Date.now)` / `DateTime @default(now())`      | Auto-set on create       |
-| `uuid`      | `string`    | `text.$defaultFn(crypto.randomUUID)` / `String @default(uuid())` | Auto-generated UUID      |
-| `ModelName` | `ModelName` | FK column / relation                                             | References another model |
+The TypeScript type is always the same regardless of ORM or database. The generated ORM column type depends on the chosen ORM and database.
+
+| Type        | TypeScript  | Drizzle — SQLite             | Drizzle — PostgreSQL        | Drizzle — MySQL                | Prisma (all databases)     | Notes                    |
+| ----------- | ----------- | ---------------------------- | --------------------------- | ------------------------------ | -------------------------- | ------------------------ |
+| `string`    | `string`    | `text`                       | `text`                      | `varchar(255)`                 | `String`                   |                          |
+| `number`    | `number`    | `integer`                    | `integer`                   | `int`                          | `Int`                      |                          |
+| `boolean`   | `boolean`   | `integer` (0/1)              | `boolean`                   | `boolean`                      | `Boolean`                  |                          |
+| `date`      | `Date`      | `integer` (epoch ms)         | `timestamp`                 | `timestamp`                    | `DateTime`                 |                          |
+| `date_now`  | `Date`      | `integer` + `.now()`         | `timestamp` + `.now()`      | `timestamp` + `.now()`         | `DateTime @default(now())` | Auto-set on create       |
+| `uuid`      | `string`    | `text` + `randomUUID()`      | `uuid` + `.defaultRandom()` | `varchar(36)` + `randomUUID()` | `String @default(uuid())`  | Auto-generated UUID      |
+| `ModelName` | `ModelName` | FK `text` / `integer` column | FK `uuid` column            | FK `varchar(36)` column        | FK relation                | References another model |
 
 ## Full field definition
 
@@ -96,9 +98,9 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 <Tabs>
-  <TabItem value="drizzle" label="Drizzle (default)" default>
+  <TabItem value="drizzle-sqlite" label="Drizzle + SQLite" default>
 
-```ts title="drizzle/schema.ts"
+```ts title="src/drizzle/schema.ts"
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 export const articles = sqliteTable("articles", {
@@ -106,8 +108,7 @@ export const articles = sqliteTable("articles", {
         .primaryKey()
         .$defaultFn(() => crypto.randomUUID()),
     title: text("title").notNull(),
-    // FK to users:
-    authorId: text("authorId"),
+    authorId: text("authorId"), // FK to users
 });
 
 export const users = sqliteTable("users", {
@@ -123,7 +124,53 @@ export const users = sqliteTable("users", {
 ```
 
   </TabItem>
-  <TabItem value="prisma" label="Prisma">
+  <TabItem value="drizzle-pg" label="Drizzle + PostgreSQL">
+
+```ts title="src/drizzle/schema.ts"
+import { pgTable, text, integer, uuid, timestamp } from "drizzle-orm/pg-core";
+
+export const articles = pgTable("articles", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    authorId: uuid("authorId"), // FK to users
+});
+
+export const users = pgTable("users", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: text("email").notNull(),
+    name: text("name").notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+```
+
+  </TabItem>
+  <TabItem value="drizzle-mysql" label="Drizzle + MySQL">
+
+```ts title="src/drizzle/schema.ts"
+import { mysqlTable, varchar, int, boolean, timestamp } from "drizzle-orm/mysql-core";
+
+export const articles = mysqlTable("articles", {
+    id: varchar("id", { length: 36 })
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    title: varchar("title", { length: 255 }).notNull(),
+    authorId: varchar("authorId", { length: 36 }), // FK to users
+});
+
+export const users = mysqlTable("users", {
+    id: varchar("id", { length: 36 })
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    email: varchar("email", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    createdAt: timestamp("createdAt")
+        .$defaultFn(() => new Date())
+        .notNull(),
+});
+```
+
+  </TabItem>
+  <TabItem value="prisma" label="Prisma (all databases)">
 
 ```prisma title="prisma/schema.prisma"
 model Article {
@@ -137,7 +184,6 @@ model User {
   email     String
   name      String
   createdAt DateTime @default(now())
-  // auto-generated backref:
   article   Article  @relation("Article_author", fields: [articleId], references: [id])
   articleId String
 }

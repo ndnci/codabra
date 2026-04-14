@@ -141,7 +141,7 @@ function buildParamType(params: Record<string, string | FunctionParam> | undefin
  * Emitted to: src/lib/functions/<Name>.ts
  */
 export function generateFunctionFile(fn: FunctionDefinition, orm?: OrmAdapter): string {
-    const resolvedOrm = orm ?? getOrmAdapter("drizzle");
+    const resolvedOrm = orm ?? getOrmAdapter("drizzle", "sqlite");
     const paramType = buildParamType(fn.params);
 
     const bodyLines: string[] = [];

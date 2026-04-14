@@ -34,7 +34,7 @@ const sidebars: SidebarsConfig = {
         {
             type: "category",
             label: "Contributing",
-            items: ["contributing/overview", "contributing/add-orm"],
+            items: ["contributing/overview", "contributing/add-orm", "contributing/add-database"],
         },
     ],
 };

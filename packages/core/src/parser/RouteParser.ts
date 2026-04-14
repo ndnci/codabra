@@ -26,7 +26,7 @@ export interface RouteGenContext {
 }
 
 function resolveOrm(context: RouteGenContext): OrmAdapter {
-    return context.orm ?? getOrmAdapter("drizzle");
+    return context.orm ?? getOrmAdapter("drizzle", "sqlite");
 }
 
 const EMPTY_CONTEXT: RouteGenContext = { models: [], functions: [], events: [], voters: [] };

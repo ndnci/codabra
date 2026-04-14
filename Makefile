@@ -12,6 +12,9 @@ build:          ## Build all packages
 dev:            ## Start dev mode (watch)
 	pnpm turbo dev
 
+generate:       ## Generate code for all packages
+	pnpm codabra generate
+
 typecheck:      ## Type-check all packages
 	pnpm turbo typecheck
 

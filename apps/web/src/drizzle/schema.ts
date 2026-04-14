@@ -6,11 +6,11 @@ export const articles = sqliteTable('articles', {
   title: text('title').notNull(),
   body: text('body'),
   published: integer('published').default(0).notNull(),
-  createdAt: integer('createdAt').$defaultFn(() => Date.now()).notNull(),
+  createdAt: integer('createdAt').$defaultFn(() => Date.now()),
 });
 export const users = sqliteTable('users', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   email: text('email').notNull(),
   name: text('name').notNull(),
-  createdAt: integer('createdAt').$defaultFn(() => Date.now()).notNull(),
+  createdAt: integer('createdAt').$defaultFn(() => Date.now()),
 });

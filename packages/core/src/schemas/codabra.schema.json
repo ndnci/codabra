@@ -4,7 +4,7 @@
     "title": "Codabra Project Configuration",
     "description": "Project-level configuration for a Codabra application.",
     "type": "object",
-    "required": ["provider", "orm"],
+    "required": ["provider", "orm", "database"],
     "additionalProperties": false,
     "properties": {
         "$schema": { "type": "string" },
@@ -19,6 +19,12 @@
             "enum": ["drizzle", "prisma"],
             "description": "The ORM to use for database access.",
             "default": "drizzle"
+        },
+        "database": {
+            "type": "string",
+            "enum": ["sqlite", "postgresql", "mysql"],
+            "description": "The database dialect to use.",
+            "default": "sqlite"
         }
     }
 }

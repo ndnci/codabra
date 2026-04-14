@@ -32,39 +32,74 @@ npx create-next-app@16.2.3 . --typescript --eslint --tailwind --app --src-dir --
 
 Future versions (v17, v18…) will be added without breaking existing projects.
 
-## ORM integration
+## ORM & database integration
 
-Codabra supports multiple ORMs. Choose during project creation:
+Codabra supports multiple ORMs and databases. Both are chosen independently during project creation:
 
 ```bash
 npx create-codabra@latest my-app
-# → Choose an ORM: Drizzle ORM (SQLite) (recommended) / Prisma (SQLite)
+# → Choose an ORM:      Drizzle ORM (recommended) / Prisma
+# → Choose a database:  SQLite (default) / PostgreSQL / MySQL
 ```
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 <Tabs>
-  <TabItem value="drizzle" label="Drizzle (default)" default>
+  <TabItem value="drizzle-sqlite" label="Drizzle + SQLite" default>
 
-Generated files: `drizzle/schema.ts` and `src/lib/db.ts`.
-
-To apply the schema and start the dev server:
+Generated files: `src/drizzle/schema.ts` and `src/lib/db.ts`.
 
 ```bash
 cd apps/web
-npx drizzle-kit push   # push schema to SQLite
+npx drizzle-kit push   # push schema to SQLite (creates sqlite.db automatically)
 pnpm dev
 ```
 
-Set up `sqlite.db` in your working directory (created automatically on first run).
+  </TabItem>
+  <TabItem value="drizzle-pg" label="Drizzle + PostgreSQL">
+
+Generated files: `src/drizzle/schema.ts` and `src/lib/db.ts`.
+
+Set `DATABASE_URL` in `apps/web/.env`:
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+```
+
+```bash
+cd apps/web
+npx drizzle-kit push
+pnpm dev
+```
 
   </TabItem>
-  <TabItem value="prisma" label="Prisma">
+  <TabItem value="drizzle-mysql" label="Drizzle + MySQL">
+
+Generated files: `src/drizzle/schema.ts` and `src/lib/db.ts`.
+
+Set `DATABASE_URL` in `apps/web/.env`:
+
+```env
+DATABASE_URL=mysql://user:password@localhost:3306/mydb
+```
+
+```bash
+cd apps/web
+npx drizzle-kit push
+pnpm dev
+```
+
+  </TabItem>
+  <TabItem value="prisma-sqlite" label="Prisma + SQLite">
 
 Generated files: `prisma/schema.prisma` and `src/lib/prisma.ts`.
 
-To apply the schema and start the dev server:
+Set `DATABASE_URL` in `apps/web/.env`:
+
+```env
+DATABASE_URL=file:./dev.db
+```
 
 ```bash
 cd apps/web
@@ -72,7 +107,39 @@ npx prisma migrate dev --name init
 pnpm dev
 ```
 
-Set `DATABASE_URL` in `apps/web/.env` first.
+  </TabItem>
+  <TabItem value="prisma-pg" label="Prisma + PostgreSQL">
+
+Generated files: `prisma/schema.prisma` and `src/lib/prisma.ts`.
+
+Set `DATABASE_URL` in `apps/web/.env`:
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+```
+
+```bash
+cd apps/web
+npx prisma migrate dev --name init
+pnpm dev
+```
+
+  </TabItem>
+  <TabItem value="prisma-mysql" label="Prisma + MySQL">
+
+Generated files: `prisma/schema.prisma` and `src/lib/prisma.ts`.
+
+Set `DATABASE_URL` in `apps/web/.env`:
+
+```env
+DATABASE_URL=mysql://user:password@localhost:3306/mydb
+```
+
+```bash
+cd apps/web
+npx prisma migrate dev --name init
+pnpm dev
+```
 
   </TabItem>
 </Tabs>

@@ -1,6 +1,9 @@
 import type { OrmAdapter } from "../index";
 import type { ModelDefinition, FieldShorthand, ModelField, RelationDef } from "../../types";
-import { normaliseField, isPrimitive } from "../../validator/ModelValidator";
+import { normaliseField } from "../../validator/ModelValidator";
+
+const SUPPORTED_DATABASES = ["sqlite", "postgresql", "mysql"] as const;
+type PrismaDatabase = (typeof SUPPORTED_DATABASES)[number];
 
 // ─────────────────────────────────────────────
 // Type maps
@@ -145,7 +148,17 @@ function prismaAccessor(modelName: string): string {
 
 export class PrismaAdapter implements OrmAdapter {
     readonly name = "prisma";
-    readonly label = "Prisma (SQLite)";
+    readonly label = "Prisma";
+    private readonly database: PrismaDatabase;
+
+    constructor(database: string) {
+        if (!(SUPPORTED_DATABASES as readonly string[]).includes(database)) {
+            throw new Error(
+                `Prisma does not support database "${database}". Supported: ${SUPPORTED_DATABASES.join(", ")}`,
+            );
+        }
+        this.database = database as PrismaDatabase;
+    }
 
     getSchemaFilePath(): string {
         return "prisma/schema.prisma";
@@ -164,7 +177,7 @@ export class PrismaAdapter implements OrmAdapter {
             `}`,
             ``,
             `datasource db {`,
-            `  provider = "sqlite"`,
+            `  provider = "${this.database}"`,
             `  url      = env("DATABASE_URL")`,
             `}`,
             ``,
@@ -266,12 +279,6 @@ export class PrismaAdapter implements OrmAdapter {
 export { generatePrismaModel, collectBackrefs };
 
 /** Generates the complete Prisma schema — kept as named export for public API */
-export function generatePrismaSchema(models: ModelDefinition[]): string {
-    return new PrismaAdapter().generateSchemaFile(models);
+export function generatePrismaSchema(models: ModelDefinition[], database = "sqlite"): string {
+    return new PrismaAdapter(database).generateSchemaFile(models);
 }
-
-/** Checks if a field type is primitive */
-function _isPrimitive(t: string): boolean {
-    return isPrimitive(t);
-}
-void _isPrimitive;
