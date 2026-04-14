@@ -3,11 +3,12 @@
     "version": "0.1.0",
     "private": true,
     "description": "Framework providers for Codabra (Next.js, and future providers)",
+    "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "scripts": {
-        "build": "tsup src/index.ts --format cjs --dts --clean",
-        "dev": "tsup src/index.ts --format cjs --dts --watch",
+        "build": "tsup src/index.ts --format esm --dts --clean",
+        "dev": "tsup src/index.ts --format esm --dts --watch",
         "typecheck": "tsc --noEmit",
         "clean": "rm -rf dist"
     },
@@ -21,7 +22,7 @@
     },
     "exports": {
         ".": {
-            "require": "./dist/index.js",
+            "import": "./dist/index.js",
             "types": "./dist/index.d.ts"
         }
     }

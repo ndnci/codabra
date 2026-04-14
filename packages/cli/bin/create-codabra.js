@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require("../dist/create/index.js");
+import("../dist/create/index.js");

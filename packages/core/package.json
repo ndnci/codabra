@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "description": "Core config loading, parsing, validation, and compilation logic for Codabra",
+    "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "files": [
@@ -10,8 +11,8 @@
         "src/schemas"
     ],
     "scripts": {
-        "build": "tsup src/index.ts --format cjs --dts --clean",
-        "dev": "tsup src/index.ts --format cjs --dts --watch",
+        "build": "tsup src/index.ts --format esm --dts --clean",
+        "dev": "tsup src/index.ts --format esm --dts --watch",
         "typecheck": "tsc --noEmit",
         "clean": "rm -rf dist"
     },
@@ -22,7 +23,7 @@
     },
     "exports": {
         ".": {
-            "require": "./dist/index.js",
+            "import": "./dist/index.js",
             "types": "./dist/index.d.ts"
         },
         "./schemas/*": "./src/schemas/*"
