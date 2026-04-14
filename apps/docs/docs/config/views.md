@@ -74,10 +74,12 @@ The `flex` type generates a `<div style={{ display: 'flex', ... }}>`. Supported 
     "path": "/dashboard",
     "root": {
         "type": "flex",
-        "direction": "row",
-        "alignItems": "center",
-        "justifyContent": "space-between",
-        "gap": 16,
+        "props": {
+            "direction": "row",
+            "alignItems": "center",
+            "justifyContent": "space-between",
+            "gap": 16
+        },
         "children": [
             { "type": "heading", "label": "Dashboard" },
             { "type": "button", "label": "New" }
