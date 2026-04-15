@@ -72,4 +72,16 @@ program
         });
     });
 
+// ── codabra create ────────────────────────────
+program
+    .command("create [name]")
+    .description("Scaffold a new Codabra project")
+    .action(async (name?: string) => {
+        const { main } = await import("./create/index.js");
+        await main(name).catch((err) => {
+            console.error(err);
+            process.exit(1);
+        });
+    });
+
 program.parse(process.argv);

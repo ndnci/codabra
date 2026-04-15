@@ -12,7 +12,7 @@ sidebar_position: 1
 ## Create a new project
 
 ```bash
-npx create-codabra@latest my-app
+npx @ndnci/codabra@alpha create my-app
 ```
 
 This will:
@@ -27,11 +27,11 @@ This will:
 ## Install in an existing project
 
 ```bash
-pnpm add -g @codabra/cli
+pnpm add -g @ndnci/codabra
 ```
 
 or use it via your project's dev dependencies:
 
 ```bash
-pnpm add -D @codabra/cli
+pnpm add -D @ndnci/codabra
 ```

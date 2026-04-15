@@ -53,7 +53,7 @@ function createRootPackageJson(projectDir: string, projectName: string): void {
                 },
                 devDependencies: {
                     turbo: "^2.0.0",
-                    "@codabra/cli": "latest",
+                    "@ndnci/codabra": "latest",
                 },
                 packageManager: "pnpm@9.0.0",
             },
@@ -211,11 +211,10 @@ function createVscodeSettings(projectDir: string): void {
 // Main create flow
 // ─────────────────────────────────────────────
 
-async function main(): Promise<void> {
+export async function main(projectName?: string): Promise<void> {
     banner();
 
-    // Get project name from argv or prompt
-    let projectName = process.argv[2];
+    // Get project name from argument or prompt
     if (!projectName) {
         projectName = await input({
             message: "Project name:",
@@ -332,7 +331,3 @@ async function main(): Promise<void> {
     console.log("");
 }
 
-main().catch((err) => {
-    console.error(chalk.red("Error:"), String(err));
-    process.exit(1);
-});
