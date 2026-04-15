@@ -8,7 +8,7 @@ importers:
 
   .:
     devDependencies:
-      '@codabra/cli':
+      '@ndnci/codabra':
         specifier: workspace:*
         version: link:packages/cli
       '@types/node':
@@ -103,12 +103,6 @@ importers:
 
   packages/cli:
     dependencies:
-      '@codabra/core':
-        specifier: workspace:*
-        version: link:../core
-      '@codabra/providers':
-        specifier: workspace:*
-        version: link:../providers
       '@inquirer/prompts':
         specifier: ^5.0.0
         version: 5.5.0
@@ -122,6 +116,12 @@ importers:
         specifier: ^5.4.1
         version: 5.4.1
     devDependencies:
+      '@codabra/core':
+        specifier: workspace:*
+        version: link:../core
+      '@codabra/providers':
+        specifier: workspace:*
+        version: link:../providers
       '@types/node':
         specifier: ^20.12.0
         version: 20.19.39
