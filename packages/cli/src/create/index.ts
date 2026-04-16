@@ -119,9 +119,9 @@ function createExampleConfig(projectDir: string): void {
         ) + "\n",
     );
 
-    // routes/users.json
+    // routes/Users.json
     writeFile(
-        path.join(projectDir, "config", "routes", "users.json"),
+        path.join(projectDir, "config", "routes", "Users.json"),
         JSON.stringify(
             {
                 $schema: `${schemaBase}/route.schema.json`,
@@ -337,4 +337,3 @@ export async function main(projectName?: string): Promise<void> {
     console.log(`Edit config files in ${chalk.bold("./config")} to define your application.`);
     console.log("");
 }
-

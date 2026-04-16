@@ -29,7 +29,7 @@ Edit `config/models/User.json`:
 
 ## 3. Define routes
 
-Edit `config/routes/users.json`:
+Edit `config/routes/Users.json`:
 
 ```json
 [

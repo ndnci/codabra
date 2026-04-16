@@ -30,9 +30,9 @@ Files can be nested in sub-folders for organisation. The folder name may be used
 
 ```
 config/routes/
-  users.json      → no prefix
+  Users.json      → no prefix
   api/
-    admin.json    → may prefix with /api
+    Admin.json    → may prefix with /api
 ```
 
 ## Multiple definitions per file

@@ -18,8 +18,8 @@ npx create-next-app@16.2.3 . --typescript --eslint --tailwind --app --src-dir --
 | ------------------------------------------ | ------------------------------------------ |
 | `models/User.json`                         | `src/types/User.ts` (TypeScript interface) |
 | `models/User.json`                         | ORM schema file (see ORM section below)    |
-| `routes/users.json` → `GET /api/users`     | `src/app/api/users/route.ts`               |
-| `routes/users.json` → `GET /api/users/:id` | `src/app/api/users/[id]/route.ts`          |
+| `routes/Users.json` → `GET /api/users`     | `src/app/api/users/route.ts`               |
+| `routes/Users.json` → `GET /api/users/:id` | `src/app/api/users/[id]/route.ts`          |
 | `views/LoginPage.json` → `path: /login`    | `src/app/login/page.tsx`                   |
 | `functions/CreateUser.json`                | `src/lib/functions/CreateUser.ts`          |
 | `voters/ArticleVoter.json`                 | `src/lib/voters/ArticleVoter.ts`           |

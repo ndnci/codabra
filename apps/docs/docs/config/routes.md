@@ -8,7 +8,7 @@ Routes define your HTTP endpoints. Files go in `config/routes/`.
 
 ## Example
 
-```json title="config/routes/users.json"
+```json title="config/routes/Users.json"
 [
     {
         "method": "GET",
