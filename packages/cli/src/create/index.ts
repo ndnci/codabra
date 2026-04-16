@@ -7,9 +7,16 @@ import ora from "ora";
 import { providerRegistry } from "@codabra/providers";
 import { ormRegistry } from "@codabra/core";
 
+declare const __CLI_VERSION__: string;
+
 // ─────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────
+
+function cliDistTag(): string {
+    const match = __CLI_VERSION__.match(/-(alpha|beta|rc)\.\d+$/);
+    return match ? match[1] : "latest";
+}
 
 function run(cmd: string, cwd: string): void {
     execSync(cmd, { cwd, stdio: "inherit" });
@@ -53,7 +60,7 @@ function createRootPackageJson(projectDir: string, projectName: string): void {
                 },
                 devDependencies: {
                     turbo: "^2.0.0",
-                    "@ndnci/codabra": "latest",
+                    "@ndnci/codabra": cliDistTag(),
                 },
                 packageManager: "pnpm@9.0.0",
             },

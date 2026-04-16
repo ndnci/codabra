@@ -1,6 +1,6 @@
 # Codabra
 
-> Configuration-driven application generator. Write JSON configs, get real apps.
+> Configuration Driven Development. Write JSON configs, get real apps.
 
 Codabra reads config files and compiles them into production-ready applications. It works on top of frameworks — not instead of them.
 
@@ -58,4 +58,4 @@ codabra build      # Generate + production build
 
 ## License
 
-MIT
+See [LICENSE](LICENSE) for details.
