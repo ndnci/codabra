@@ -14,6 +14,7 @@ import { spawn } from "child_process";
 const bundledSchemasDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../schemas");
 import ora from "ora";
 import { findConfigDir, findAppDir, logSuccess, logError, logWarn, logInfo } from "../utils";
+import { runDbAction } from "./db";
 
 export interface ProviderConfig {
     provider: string;
@@ -216,6 +217,39 @@ export async function generateCommand(opts: GenerateOptions = {}): Promise<boole
 
         // Ensure ORM runtime deps are present in the app's package.json
         await syncOrmDeps(appDir, projectRoot, cfg.orm, cfg.database);
+
+        // ── ORM config file (e.g. drizzle.config.ts) ──────────────────────
+        const adapter = getOrmAdapter(cfg.orm, cfg.database);
+        const ormConfigPath = adapter.getOrmConfigFilePath();
+        if (ormConfigPath) {
+            const ormConfigContent = adapter.generateOrmConfigFile()!;
+            fs.writeFileSync(path.join(appDir, ormConfigPath), ormConfigContent, "utf-8");
+            logSuccess(`  ${ormConfigPath}`);
+        }
+
+        // ── .env.local (only create if missing — never overwrite user edits) ─
+        const envPath = path.join(appDir, ".env.local");
+        if (!fs.existsSync(envPath)) {
+            const projectName = path.basename(projectRoot);
+            fs.writeFileSync(envPath, adapter.getEnvTemplate(projectName), "utf-8");
+            logInfo(`Created .env.local with DATABASE_URL template`);
+        }
+
+        // ── Schema push ────────────────────────────────────────────────────
+        if (!adapter.requiresDatabaseUrl()) {
+            // SQLite: push is safe and instant — always run automatically
+            const pushSpinner = ora("Pushing schema to database…").start();
+            const pushOk = await runDbAction("push", { appDir, ormName: cfg.orm, database: cfg.database });
+            if (pushOk) {
+                pushSpinner.succeed("Schema pushed to database");
+            } else {
+                pushSpinner.fail("Schema push failed — run 'codabra db push' manually");
+                allOk = false;
+            }
+        } else {
+            logWarn(`Schema generated. Run 'codabra db push' after starting your database.`);
+            logWarn(`Make sure DATABASE_URL is set in ${path.relative(projectRoot, envPath)}`);
+        }
     }
 
     // Write model-aware schemas for VS Code autocomplete.

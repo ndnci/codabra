@@ -33,6 +33,11 @@ const sidebars: SidebarsConfig = {
         },
         {
             type: "category",
+            label: "Deployment",
+            items: ["deployment/docker"],
+        },
+        {
+            type: "category",
             label: "Contributing",
             items: ["contributing/overview", "contributing/add-orm", "contributing/add-database"],
         },

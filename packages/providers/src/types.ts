@@ -32,6 +32,14 @@ export interface Provider {
      * Run the framework build inside the target app directory.
      */
     runBuild(appDir: string): Promise<void>;
+
+    /**
+     * Returns the content of the Dockerfile for this provider.
+     * Used by the Docker config generator to create `docker/<providerName>/Dockerfile`.
+     * The Dockerfile is written at build context root (monorepo root), so paths
+     * like `apps/<providerName>/` are relative to that.
+     */
+    generateDockerfile(): string;
 }
 
 /** Registry entry — lets the CLI enumerate available providers. */

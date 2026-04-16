@@ -1,7 +1,8 @@
-import { spawn } from "child_process";
+import { spawn, execSync } from "child_process";
 import * as path from "path";
 import { generateCommand, readProviderConfigs } from "./generate";
 import { findConfigDir, findAppDir, logInfo, logError, logSuccess, logWarn } from "../utils";
+import { hasDockerDevServices } from "../docker";
 
 export interface DevOptions {
     /** Run the dev server for this specific provider (defaults to first in codabra.json) */
@@ -32,7 +33,26 @@ export async function devCommand(opts: DevOptions = {}): Promise<void> {
         logWarn(`Multiple providers configured. Starting "${cfg.provider}". Use --provider to pick a different one.`);
     }
 
-    // 1. Generate first
+    // 1. Start Docker DB services if needed (non-SQLite databases)
+    const configDir = findConfigDir(cwd);
+    if (configDir) {
+        const projectRoot = path.dirname(configDir);
+        if (hasDockerDevServices(projectRoot)) {
+            logInfo("Starting Docker database services…");
+            try {
+                execSync("docker compose -f docker/docker-compose.dev.yml up -d", {
+                    cwd: projectRoot,
+                    stdio: "inherit",
+                });
+                logSuccess("Database services started");
+            } catch {
+                logWarn("Could not start Docker services — make sure Docker is running.");
+                logWarn("Run 'make dev-up' manually if needed.");
+            }
+        }
+    }
+
+    // 2. Generate first
     logInfo("Generating files from config…");
     const ok = await generateCommand({
         providerFilter: cfg.provider,
@@ -45,7 +65,7 @@ export async function devCommand(opts: DevOptions = {}): Promise<void> {
         process.exit(1);
     }
 
-    // 2. Start the dev server
+    // 3. Start the dev server
     const appDir = opts.appDir ?? findAppDir(cwd, cfg.provider);
     const port = opts.port ?? "3000";
 

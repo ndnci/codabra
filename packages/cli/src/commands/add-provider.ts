@@ -5,9 +5,10 @@ import { select, confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import ora from "ora";
 import { providerRegistry } from "@codabra/providers";
-import { ormRegistry, getOrmAdapter } from "@codabra/core";
-import { findConfigDir, logError, logInfo, logSuccess, logWarn } from "../utils";
+import { ormRegistry } from "@codabra/core";
+import { findConfigDir, logError, logInfo, logSuccess, logWarn, injectOrmDeps } from "../utils";
 import { readProviderConfigs, generateCommand, type ProviderConfig } from "./generate";
+import { generateDockerConfig, ensureDockerIfNeeded } from "../docker";
 
 function writeCodabraJson(cwd: string, providers: ProviderConfig[]): void {
     const filePath = path.join(cwd, "codabra.json");
@@ -18,45 +19,6 @@ function writeCodabraJson(cwd: string, providers: ProviderConfig[]): void {
     fs.writeFileSync(filePath, JSON.stringify(existing, null, 2) + "\n", "utf-8");
 }
 
-function injectOrmDeps(appDir: string, ormName: string, database: string): boolean {
-    const pkgPath = path.join(appDir, "package.json");
-    if (!fs.existsSync(pkgPath)) return false;
-
-    let pkg: Record<string, unknown>;
-    try {
-        pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8")) as Record<string, unknown>;
-    } catch {
-        return false;
-    }
-
-    const adapter = getOrmAdapter(ormName, database);
-    const runtimeDeps = adapter.getDependencies();
-    const devDeps = adapter.getDevDependencies();
-
-    const deps = (pkg.dependencies ?? {}) as Record<string, string>;
-    const dev = (pkg.devDependencies ?? {}) as Record<string, string>;
-
-    let changed = false;
-    for (const [name, version] of Object.entries(runtimeDeps)) {
-        if (!deps[name]) {
-            deps[name] = version;
-            changed = true;
-        }
-    }
-    for (const [name, version] of Object.entries(devDeps)) {
-        if (!dev[name]) {
-            dev[name] = version;
-            changed = true;
-        }
-    }
-
-    if (!changed) return false;
-
-    pkg.dependencies = deps;
-    pkg.devDependencies = dev;
-    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
-    return true;
-}
 
 function runInstall(projectRoot: string): Promise<boolean> {
     return new Promise((resolve) => {
@@ -135,6 +97,9 @@ export async function addProviderCommand(): Promise<void> {
     );
     console.log("");
 
+    // Check Docker availability if the chosen database requires it
+    await ensureDockerIfNeeded(database, confirm);
+
     const confirmed = await confirm({ message: "Add this provider?", default: true });
     if (!confirmed) {
         console.log(chalk.yellow("Aborted."));
@@ -178,6 +143,12 @@ export async function addProviderCommand(): Promise<void> {
     } else {
         installSpinner.warn("pnpm install failed — run it manually from your project root");
     }
+
+    // ── Regenerate Docker config with updated provider list ───────────────
+    const dockerSpinner = ora("Updating Docker config…").start();
+    const projectName = path.basename(projectRoot);
+    generateDockerConfig(projectRoot, projectName, updatedConfigs);
+    dockerSpinner.succeed("Docker config updated");
 
     // ── Generate files for new provider ───────
     const generateSpinner = ora(`Generating files for ${providerName}…`).start();

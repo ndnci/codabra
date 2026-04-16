@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import chalk from "chalk";
+import { getOrmAdapter } from "@codabra/core";
 
 /** Locate the nearest /config directory, walking up from cwd. */
 export function findConfigDir(startDir: string = process.cwd()): string | null {
@@ -48,4 +49,48 @@ export function logWarn(msg: string): void {
 
 export function logError(msg: string): void {
     console.error(chalk.red("✖"), msg);
+}
+
+/**
+ * Injects ORM runtime/dev deps into the app's package.json.
+ * Returns true if the file was modified (new deps were added).
+ */
+export function injectOrmDeps(appDir: string, ormName: string, database: string): boolean {
+    const pkgPath = path.join(appDir, "package.json");
+    if (!fs.existsSync(pkgPath)) return false;
+
+    let pkg: Record<string, unknown>;
+    try {
+        pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8")) as Record<string, unknown>;
+    } catch {
+        return false;
+    }
+
+    const adapter = getOrmAdapter(ormName, database);
+    const runtimeDeps = adapter.getDependencies();
+    const devDeps = adapter.getDevDependencies();
+
+    const deps = (pkg.dependencies ?? {}) as Record<string, string>;
+    const dev = (pkg.devDependencies ?? {}) as Record<string, string>;
+
+    let changed = false;
+    for (const [name, version] of Object.entries(runtimeDeps)) {
+        if (!deps[name]) {
+            deps[name] = version;
+            changed = true;
+        }
+    }
+    for (const [name, version] of Object.entries(devDeps)) {
+        if (!dev[name]) {
+            dev[name] = version;
+            changed = true;
+        }
+    }
+
+    if (!changed) return false;
+
+    pkg.dependencies = deps;
+    pkg.devDependencies = dev;
+    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
+    return true;
 }

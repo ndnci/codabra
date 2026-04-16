@@ -9,7 +9,10 @@ import { select, input, confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import ora from "ora";
 import { providerRegistry } from "@codabra/providers";
-import { ormRegistry, getOrmAdapter } from "@codabra/core";
+import { ormRegistry } from "@codabra/core";
+import { generateDockerConfig, ensureDockerIfNeeded } from "../docker";
+import { injectOrmDeps } from "../utils";
+
 
 declare const __CLI_VERSION__: string;
 
@@ -194,38 +197,6 @@ function createCodabraJson(projectDir: string, providerName: string, ormName: st
     );
 }
 
-/**
- * Injects ORM runtime/dev deps into the app's package.json so they are
- * present when the user runs their first `pnpm install`.
- */
-function injectOrmDeps(appDir: string, ormName: string, database: string): void {
-    const pkgPath = path.join(appDir, "package.json");
-    if (!fs.existsSync(pkgPath)) return;
-    let pkg: Record<string, unknown>;
-    try {
-        pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8")) as Record<string, unknown>;
-    } catch {
-        return;
-    }
-
-    const adapter = getOrmAdapter(ormName, database);
-    const runtimeDeps = adapter.getDependencies();
-    const devDeps = adapter.getDevDependencies();
-
-    const deps = (pkg.dependencies ?? {}) as Record<string, string>;
-    const dev = (pkg.devDependencies ?? {}) as Record<string, string>;
-
-    for (const [name, version] of Object.entries(runtimeDeps)) {
-        if (!deps[name]) deps[name] = version;
-    }
-    for (const [name, version] of Object.entries(devDeps)) {
-        if (!dev[name]) dev[name] = version;
-    }
-
-    pkg.dependencies = deps;
-    pkg.devDependencies = dev;
-    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
-}
 
 function createVscodeSettings(projectDir: string): void {
     const schemaBase = "./.codabra/schemas";
@@ -311,6 +282,9 @@ export async function main(projectName?: string): Promise<void> {
         default: selectedOrm.defaultDatabase,
     });
 
+    // Check Docker availability if the chosen database requires it
+    await ensureDockerIfNeeded(database, confirm);
+
     // Confirm
     console.log("");
     console.log(chalk.bold("Project summary:"));
@@ -345,6 +319,7 @@ export async function main(projectName?: string): Promise<void> {
     writeInitialSchemas(projectDir);
     createCodabraJson(projectDir, providerName, ormName, database);
     createVscodeSettings(projectDir);
+    generateDockerConfig(projectDir, projectName, [{ provider: providerName, orm: ormName, database }]);
     spinner.succeed("Monorepo structure created");
 
     // ── Create example config ──────────────────
@@ -373,14 +348,25 @@ export async function main(projectName?: string): Promise<void> {
     injectOrmDeps(appDir, ormName, database);
 
     // ── Done ───────────────────────────────────
+    const needsDocker = database !== "sqlite";
+
     console.log("");
     console.log(chalk.green.bold("✔ Project created!"));
     console.log("");
     console.log("Next steps:");
     console.log(`  ${chalk.cyan(`cd ${projectName}`)}`);
     console.log(`  ${chalk.cyan("pnpm install")}`);
-    console.log(`  ${chalk.cyan("pnpm codabra generate")}   ${chalk.dim("# generate app from config")}`);
-    console.log(`  ${chalk.cyan("pnpm codabra dev")}         ${chalk.dim("# start dev server")}`);
+    if (needsDocker) {
+        console.log(`  ${chalk.cyan("make dev-up")}              ${chalk.dim(`# start ${database} container`)}`);
+    }
+    console.log(
+        `  ${chalk.cyan("pnpm codabra generate")}   ${chalk.dim(
+            needsDocker
+                ? "# generate app + push schema (needs DB running)"
+                : "# generate app + push schema to SQLite",
+        )}`,
+    );
+    console.log(`  ${chalk.cyan("pnpm codabra dev")}         ${chalk.dim("# start dev server (also starts DB if needed)")}`);
     console.log("");
     console.log(`Edit config files in ${chalk.bold("./config")} to define your application.`);
     console.log("");

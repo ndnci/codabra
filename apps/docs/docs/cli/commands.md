@@ -113,6 +113,83 @@ codabra upgrade --version 0.5.0
 codabra upgrade --version 0.5.0-alpha.2
 ```
 
+## `codabra db`
+
+Manage the database lifecycle — push schemas, generate migration files, and apply them.
+
+```bash
+codabra db <action> [options]
+```
+
+### `codabra db push`
+
+Push the current ORM schema directly to the database. The recommended workflow for development — no migration files are created.
+
+- **Drizzle + SQLite**: runs automatically after every `codabra generate` (safe, instant).
+- **Drizzle + PostgreSQL / MySQL**: reads `DATABASE_URL` from `.env.local`, then runs `drizzle-kit push`.
+- **Prisma (any database)**: runs `prisma generate && prisma db push`.
+
+```bash
+codabra db push [options]
+```
+
+| Option                  | Default  | Description                        |
+| ----------------------- | -------- | ---------------------------------- |
+| `-p, --provider <name>` | _(all)_  | Only run for this provider         |
+
+### `codabra db generate`
+
+Generate versioned migration files without applying them. Use this for production-ready migration workflows.
+
+```bash
+codabra db generate [options]
+```
+
+| Option                  | Default        | Description                        |
+| ----------------------- | -------------- | ---------------------------------- |
+| `-p, --provider <name>` | _(all)_        | Only run for this provider         |
+| `-n, --name <name>`     | `"migration"`  | Migration name (Drizzle / Prisma)  |
+
+### `codabra db migrate`
+
+Apply pending migration files to the database.
+
+- **Drizzle**: runs `drizzle-kit migrate`.
+- **Prisma**: runs `prisma migrate deploy`.
+
+```bash
+codabra db migrate [options]
+```
+
+| Option                  | Default  | Description                        |
+| ----------------------- | -------- | ---------------------------------- |
+| `-p, --provider <name>` | _(all)_  | Only run for this provider         |
+
+### How `DATABASE_URL` is resolved
+
+For databases that require a connection string (PostgreSQL, MySQL), the commands look for `DATABASE_URL` in this order:
+
+1. The current environment (`process.env.DATABASE_URL`)
+2. The `.env.local` file in the app directory
+
+If neither is set, the command warns and exits without running. The `.env.local` file is created automatically by `codabra generate` if it does not exist, with a pre-filled value matching the Docker dev service credentials.
+
+### Examples
+
+```bash
+# Push schema after changing a model (SQLite — runs automatically via codabra generate)
+codabra db push
+
+# Push schema for PostgreSQL (requires DATABASE_URL in .env.local or env)
+codabra db push --provider nextjs
+
+# Generate a named migration file
+codabra db generate --name add_articles_table
+
+# Apply pending migrations (CI / production)
+codabra db migrate
+```
+
 ## `codabra add-provider`
 
 Add a new framework provider to an existing Codabra project. This command is interactive — it prompts you to choose a provider, ORM, and database, then:

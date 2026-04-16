@@ -92,6 +92,23 @@ export interface OrmAdapter {
     getDependencies(): Record<string, string>;
     /** Dev npm dependencies this ORM needs */
     getDevDependencies(): Record<string, string>;
+
+    // ── Database lifecycle ────────────────────────────────────────────────
+
+    /** Path to the ORM config file relative to appDir (e.g. "drizzle.config.ts"), or null if not needed */
+    getOrmConfigFilePath(): string | null;
+    /** Content of the ORM config file, or null if no separate config file is needed */
+    generateOrmConfigFile(): string | null;
+    /** Shell command to push the schema directly to the DB (safe for dev). Runs in appDir. */
+    getPushCommand(): string;
+    /** Shell command to generate versioned migration files. Runs in appDir. */
+    getMigrateGenerateCommand(name?: string): string;
+    /** Shell command to apply pending migration files. Runs in appDir. */
+    getMigrateApplyCommand(): string;
+    /** Whether this adapter+database requires DATABASE_URL to be set before pushing */
+    requiresDatabaseUrl(): boolean;
+    /** Content for .env.local — DATABASE_URL with a working default (matches Docker dev config) */
+    getEnvTemplate(projectName: string): string;
 }
 
 // ─────────────────────────────────────────────

@@ -3,7 +3,8 @@ import * as path from "path";
 import { spawn } from "child_process";
 import ora from "ora";
 import { findConfigDir, logSuccess, logInfo, logWarn, logError } from "../utils.js";
-import { generateCommand } from "./generate.js";
+import { generateCommand, readProviderConfigs } from "./generate.js";
+import { generateDockerConfig } from "../docker.js";
 
 export interface UpgradeOptions {
     version?: string;
@@ -119,5 +120,15 @@ export async function upgradeCommand(opts: UpgradeOptions = {}): Promise<boolean
         }
     }
 
-    return generateCommand({});
+    const generateOk = await generateCommand({});
+
+    // Regenerate Docker config to reflect any structural changes after upgrade
+    const providerConfigs = readProviderConfigs(projectRoot);
+    if (providerConfigs.length > 0) {
+        const projectName = path.basename(projectRoot);
+        generateDockerConfig(projectRoot, projectName, providerConfigs);
+        logSuccess("Docker config updated");
+    }
+
+    return generateOk;
 }

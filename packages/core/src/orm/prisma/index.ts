@@ -273,6 +273,36 @@ export class PrismaAdapter implements OrmAdapter {
     getDevDependencies(): Record<string, string> {
         return { prisma: "^5.0.0" };
     }
+
+    getOrmConfigFilePath(): null {
+        return null;
+    }
+
+    generateOrmConfigFile(): null {
+        return null;
+    }
+
+    getPushCommand(): string {
+        return "pnpm exec prisma generate && pnpm exec prisma db push";
+    }
+
+    getMigrateGenerateCommand(name?: string): string {
+        return `pnpm exec prisma migrate dev --name ${name ?? "migration"}`;
+    }
+
+    getMigrateApplyCommand(): string {
+        return "pnpm exec prisma migrate deploy";
+    }
+
+    requiresDatabaseUrl(): boolean {
+        return true;
+    }
+
+    getEnvTemplate(projectName: string): string {
+        if (this.database === "sqlite") return `DATABASE_URL=file:./sqlite.db\n`;
+        if (this.database === "mysql") return `DATABASE_URL=mysql://root:root@localhost:3306/${projectName}_dev\n`;
+        return `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/${projectName}_dev\n`;
+    }
 }
 
 // Re-export schema generation for backward compat (used by core/index.ts public API)

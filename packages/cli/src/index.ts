@@ -4,6 +4,7 @@ import { buildCommand } from "./commands/build";
 import { generateCommand } from "./commands/generate";
 import { validateCommand } from "./commands/validate";
 import { addProviderCommand } from "./commands/add-provider";
+import { dbCommand } from "./commands/db";
 
 const program = new Command();
 
@@ -92,6 +93,43 @@ program
             process.exit(1);
         });
     });
+
+// ── codabra db ────────────────────────────────
+const dbProgram = new Command("db").description("Database lifecycle commands (push, generate, migrate)");
+
+dbProgram
+    .command("push")
+    .description("Push the schema directly to the database (recommended for dev)")
+    .option("-p, --provider <name>", "Only run for this provider")
+    .action(async (opts) => {
+        const ok = await dbCommand({ action: "push", providerFilter: opts.provider as string | undefined });
+        process.exit(ok ? 0 : 1);
+    });
+
+dbProgram
+    .command("generate")
+    .description("Generate versioned migration files")
+    .option("-p, --provider <name>", "Only run for this provider")
+    .option("-n, --name <name>", "Migration name", "migration")
+    .action(async (opts) => {
+        const ok = await dbCommand({
+            action: "generate",
+            providerFilter: opts.provider as string | undefined,
+            migrationName: opts.name as string | undefined,
+        });
+        process.exit(ok ? 0 : 1);
+    });
+
+dbProgram
+    .command("migrate")
+    .description("Apply pending migration files to the database")
+    .option("-p, --provider <name>", "Only run for this provider")
+    .action(async (opts) => {
+        const ok = await dbCommand({ action: "migrate", providerFilter: opts.provider as string | undefined });
+        process.exit(ok ? 0 : 1);
+    });
+
+program.addCommand(dbProgram);
 
 // ── codabra create ────────────────────────────
 program
