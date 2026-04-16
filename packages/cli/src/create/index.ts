@@ -9,7 +9,7 @@ import { select, input, confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import ora from "ora";
 import { providerRegistry } from "@codabra/providers";
-import { ormRegistry } from "@codabra/core";
+import { ormRegistry, getOrmAdapter } from "@codabra/core";
 
 declare const __CLI_VERSION__: string;
 
@@ -21,7 +21,8 @@ function writeInitialSchemas(projectDir: string): void {
     const dest = path.join(projectDir, ".codabra", "schemas");
     fs.mkdirSync(dest, { recursive: true });
     for (const file of ["codabra.schema.json", "model.schema.json", "route.schema.json", "view.schema.json"]) {
-        fs.copyFileSync(path.join(bundledSchemasDir, file), path.join(dest, file));
+        const schema = JSON.parse(fs.readFileSync(path.join(bundledSchemasDir, file), "utf-8"));
+        fs.writeFileSync(path.join(dest, file), JSON.stringify(schema));
     }
 }
 
@@ -185,14 +186,45 @@ function createCodabraJson(projectDir: string, providerName: string, ormName: st
         JSON.stringify(
             {
                 $schema: "./.codabra/schemas/codabra.schema.json",
-                provider: providerName,
-                orm: ormName,
-                database,
+                providers: [{ provider: providerName, orm: ormName, database }],
             },
             null,
             2,
         ) + "\n",
     );
+}
+
+/**
+ * Injects ORM runtime/dev deps into the app's package.json so they are
+ * present when the user runs their first `pnpm install`.
+ */
+function injectOrmDeps(appDir: string, ormName: string, database: string): void {
+    const pkgPath = path.join(appDir, "package.json");
+    if (!fs.existsSync(pkgPath)) return;
+    let pkg: Record<string, unknown>;
+    try {
+        pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8")) as Record<string, unknown>;
+    } catch {
+        return;
+    }
+
+    const adapter = getOrmAdapter(ormName, database);
+    const runtimeDeps = adapter.getDependencies();
+    const devDeps = adapter.getDevDependencies();
+
+    const deps = (pkg.dependencies ?? {}) as Record<string, string>;
+    const dev = (pkg.devDependencies ?? {}) as Record<string, string>;
+
+    for (const [name, version] of Object.entries(runtimeDeps)) {
+        if (!deps[name]) deps[name] = version;
+    }
+    for (const [name, version] of Object.entries(devDeps)) {
+        if (!dev[name]) dev[name] = version;
+    }
+
+    pkg.dependencies = deps;
+    pkg.devDependencies = dev;
+    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
 }
 
 function createVscodeSettings(projectDir: string): void {
@@ -336,6 +368,9 @@ export async function main(projectName?: string): Promise<void> {
         console.log(chalk.dim(`  cd ${path.join(projectName, "apps", providerName)}`));
         console.log(chalk.dim(`  ${provider.initCommand}`));
     }
+
+    // ── Inject ORM dependencies ────────────────
+    injectOrmDeps(appDir, ormName, database);
 
     // ── Done ───────────────────────────────────
     console.log("");

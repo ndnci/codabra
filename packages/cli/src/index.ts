@@ -3,6 +3,7 @@ import { devCommand } from "./commands/dev";
 import { buildCommand } from "./commands/build";
 import { generateCommand } from "./commands/generate";
 import { validateCommand } from "./commands/validate";
+import { addProviderCommand } from "./commands/add-provider";
 
 const program = new Command();
 
@@ -13,14 +14,12 @@ program
     .command("generate")
     .alias("g")
     .description("Generate application files from your config")
-    .option("-p, --provider <name>", "Provider to use (e.g. nextjs)", "nextjs")
-    .option("-o, --orm <name>", "ORM to use (drizzle or prisma)")
+    .option("-p, --provider <name>", "Only generate for this provider (omit for all)")
     .option("-c, --config <path>", "Path to the config directory")
     .option("-a, --app-dir <path>", "Path to the target application directory")
     .action(async (opts) => {
         const ok = await generateCommand({
-            provider: opts.provider as string,
-            orm: opts.orm as string | undefined,
+            providerFilter: opts.provider as string | undefined,
             config: opts.config as string | undefined,
             appDir: opts.appDir as string | undefined,
         });
@@ -44,13 +43,13 @@ program
 program
     .command("dev")
     .description("Generate files and start the development server")
-    .option("-p, --provider <name>", "Provider to use (e.g. nextjs)", "nextjs")
+    .option("-p, --provider <name>", "Provider to start (defaults to first in codabra.json)")
     .option("-c, --config <path>", "Path to the config directory")
     .option("-a, --app-dir <path>", "Path to the target application directory")
     .option("--port <port>", "Port for the dev server", "3000")
     .action(async (opts) => {
         await devCommand({
-            provider: opts.provider as string,
+            providerFilter: opts.provider as string | undefined,
             config: opts.config as string | undefined,
             appDir: opts.appDir as string | undefined,
             port: opts.port as string,
@@ -61,12 +60,12 @@ program
 program
     .command("build")
     .description("Generate files and run the production build")
-    .option("-p, --provider <name>", "Provider to use (e.g. nextjs)", "nextjs")
+    .option("-p, --provider <name>", "Provider to build (defaults to first in codabra.json)")
     .option("-c, --config <path>", "Path to the config directory")
     .option("-a, --app-dir <path>", "Path to the target application directory")
     .action(async (opts) => {
         await buildCommand({
-            provider: opts.provider as string,
+            providerFilter: opts.provider as string | undefined,
             config: opts.config as string | undefined,
             appDir: opts.appDir as string | undefined,
         });
@@ -81,6 +80,17 @@ program
         const { upgradeCommand } = await import("./commands/upgrade.js");
         const ok = await upgradeCommand({ version: opts.version as string | undefined });
         process.exit(ok ? 0 : 1);
+    });
+
+// ── codabra add-provider ──────────────────────
+program
+    .command("add-provider")
+    .description("Add a new provider to an existing Codabra project")
+    .action(async () => {
+        await addProviderCommand().catch((err) => {
+            console.error(err);
+            process.exit(1);
+        });
     });
 
 // ── codabra create ────────────────────────────
