@@ -1,6 +1,10 @@
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import { fileURLToPath } from "url";
+
+// dist/create/index.js → ../../schemas/
+const bundledSchemasDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../schemas");
 import { select, input, confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import ora from "ora";
@@ -12,6 +16,14 @@ declare const __CLI_VERSION__: string;
 // ─────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────
+
+function writeInitialSchemas(projectDir: string): void {
+    const dest = path.join(projectDir, ".codabra", "schemas");
+    fs.mkdirSync(dest, { recursive: true });
+    for (const file of ["codabra.schema.json", "model.schema.json", "route.schema.json", "view.schema.json"]) {
+        fs.copyFileSync(path.join(bundledSchemasDir, file), path.join(dest, file));
+    }
+}
 
 function cliDistTag(): string {
     const match = __CLI_VERSION__.match(/-(alpha|beta|rc)\.\d+$/);
@@ -99,7 +111,7 @@ function createGitIgnore(projectDir: string): void {
 }
 
 function createExampleConfig(projectDir: string): void {
-    const schemaBase = "./node_modules/@codabra/core/schemas";
+    const schemaBase = "../../.codabra/schemas";
 
     // models/User.json
     writeFile(
@@ -172,7 +184,7 @@ function createCodabraJson(projectDir: string, providerName: string, ormName: st
         path.join(projectDir, "codabra.json"),
         JSON.stringify(
             {
-                $schema: "./node_modules/@codabra/core/schemas/codabra.schema.json",
+                $schema: "./.codabra/schemas/codabra.schema.json",
                 provider: providerName,
                 orm: ormName,
                 database,
@@ -184,7 +196,7 @@ function createCodabraJson(projectDir: string, providerName: string, ormName: st
 }
 
 function createVscodeSettings(projectDir: string): void {
-    const schemaBase = "./node_modules/@codabra/core/schemas";
+    const schemaBase = "./.codabra/schemas";
     writeFile(
         path.join(projectDir, ".vscode", "settings.json"),
         JSON.stringify(
@@ -298,6 +310,7 @@ export async function main(projectName?: string): Promise<void> {
     createTurboJson(projectDir);
     createPnpmWorkspace(projectDir);
     createGitIgnore(projectDir);
+    writeInitialSchemas(projectDir);
     createCodabraJson(projectDir, providerName, ormName, database);
     createVscodeSettings(projectDir);
     spinner.succeed("Monorepo structure created");

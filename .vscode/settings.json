@@ -22,7 +22,7 @@
             "fileMatch": [
                 "codabra.json"
             ],
-            "url": "./node_modules/@codabra/core/src/schemas/codabra.schema.json"
+            "url": "./.codabra/schemas/codabra.schema.json"
         }
     ]
 }

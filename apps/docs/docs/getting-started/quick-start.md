@@ -7,7 +7,7 @@ sidebar_position: 2
 ## 1. Create your project
 
 ```bash
-npx create-codabra@latest my-app
+npx @ndnci/codabra@alpha create my-app
 cd my-app
 pnpm install
 ```
@@ -32,12 +32,14 @@ Edit `config/models/User.json`:
 Edit `config/routes/Users.json`:
 
 ```json
-[
-    { "method": "GET", "path": "/api/users", "response": "User[]" },
-    { "method": "POST", "path": "/api/users", "body": { "email": "string", "name": "string" }, "response": "User" },
-    { "method": "GET", "path": "/api/users/:id", "params": { "id": "uuid" }, "response": "User" },
-    { "method": "DELETE", "path": "/api/users/:id", "params": { "id": "uuid" } }
-]
+{
+    "routes": [
+        { "method": "GET", "path": "/api/users", "response": "User[]" },
+        { "method": "POST", "path": "/api/users", "body": { "email": "string", "name": "string" }, "response": "User" },
+        { "method": "GET", "path": "/api/users/:id", "params": { "id": "uuid" }, "response": "User" },
+        { "method": "DELETE", "path": "/api/users/:id", "params": { "id": "uuid" } }
+    ]
+}
 ```
 
 ## 4. Define a view

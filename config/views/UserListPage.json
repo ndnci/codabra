@@ -1,4 +1,5 @@
 {
+    "$schema": "../../.codabra/schemas/view.schema.json",
     "name": "UserListPage",
     "path": "/users",
     "root": {

@@ -1,4 +1,5 @@
 {
+    "$schema": "../../.codabra/schemas/model.schema.json",
     "name": "Article",
     "fields": {
         "title": "string",

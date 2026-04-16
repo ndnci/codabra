@@ -68,7 +68,12 @@ export class JSONLoader implements ConfigLoader {
 
         const routesDir = path.join(configDir, "routes");
         for (const { data } of readJsonFiles(routesDir)) {
-            routes.push(...toArray<RouteDefinition>(data));
+            const d = data as Record<string, unknown>;
+            if (Array.isArray(d.routes)) {
+                routes.push(...(d.routes as RouteDefinition[]));
+            } else {
+                routes.push(...toArray<RouteDefinition>(data));
+            }
         }
 
         const viewsDir = path.join(configDir, "views");

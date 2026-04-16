@@ -9,33 +9,35 @@ Routes define your HTTP endpoints. Files go in `config/routes/`.
 ## Example
 
 ```json title="config/routes/Users.json"
-[
-    {
-        "method": "GET",
-        "path": "/api/users",
-        "response": "User[]"
-    },
-    {
-        "method": "POST",
-        "path": "/api/users",
-        "body": {
-            "email": "string",
-            "name": "string"
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/api/users",
+            "response": "User[]"
         },
-        "response": "User"
-    },
-    {
-        "method": "GET",
-        "path": "/api/users/:id",
-        "params": { "id": "uuid" },
-        "response": "User"
-    },
-    {
-        "method": "DELETE",
-        "path": "/api/users/:id",
-        "params": { "id": "uuid" }
-    }
-]
+        {
+            "method": "POST",
+            "path": "/api/users",
+            "body": {
+                "email": "string",
+                "name": "string"
+            },
+            "response": "User"
+        },
+        {
+            "method": "GET",
+            "path": "/api/users/:id",
+            "params": { "id": "uuid" },
+            "response": "User"
+        },
+        {
+            "method": "DELETE",
+            "path": "/api/users/:id",
+            "params": { "id": "uuid" }
+        }
+    ]
+}
 ```
 
 ## Route fields

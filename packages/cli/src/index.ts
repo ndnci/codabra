@@ -72,6 +72,17 @@ program
         });
     });
 
+// ── codabra upgrade ───────────────────────────
+program
+    .command("upgrade")
+    .description("Upgrade @ndnci/codabra and regenerate application files")
+    .option("-v, --version <version>", "Specific version to upgrade to")
+    .action(async (opts) => {
+        const { upgradeCommand } = await import("./commands/upgrade.js");
+        const ok = await upgradeCommand({ version: opts.version as string | undefined });
+        process.exit(ok ? 0 : 1);
+    });
+
 // ── codabra create ────────────────────────────
 program
     .command("create [name]")

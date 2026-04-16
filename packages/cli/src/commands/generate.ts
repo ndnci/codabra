@@ -2,6 +2,9 @@ import { JSONLoader, buildDynamicRouteSchema, buildDynamicModelSchema, buildDyna
 import { getProvider } from "@codabra/providers";
 import * as fs from "fs";
 import * as path from "path";
+import { fileURLToPath } from "url";
+
+const bundledSchemasDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../schemas");
 import ora from "ora";
 import { findConfigDir, findAppDir, logSuccess, logError, logWarn, logInfo } from "../utils";
 
@@ -49,6 +52,10 @@ function writeDynamicSchemas(cwd: string, models: import("@codabra/core").ModelD
         path.join(dynamicDir, "view.schema.json"),
         JSON.stringify(buildDynamicViewSchema(models), null, 2) + "\n",
     );
+    fs.copyFileSync(
+        path.join(bundledSchemasDir, "codabra.schema.json"),
+        path.join(dynamicDir, "codabra.schema.json"),
+    );
 }
 
 /**
@@ -72,7 +79,7 @@ function updateVscodeSchemaSettings(cwd: string): void {
         { fileMatch: ["config/models/*.json"], url: "./.codabra/schemas/model.schema.json" },
         { fileMatch: ["config/routes/*.json"], url: "./.codabra/schemas/route.schema.json" },
         { fileMatch: ["config/views/*.json"], url: "./.codabra/schemas/view.schema.json" },
-        { fileMatch: ["codabra.json"], url: "./node_modules/@codabra/core/src/schemas/codabra.schema.json" },
+        { fileMatch: ["codabra.json"], url: "./.codabra/schemas/codabra.schema.json" },
     ];
 
     fs.mkdirSync(vscodeDir, { recursive: true });

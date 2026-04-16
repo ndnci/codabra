@@ -58,4 +58,4 @@ export { Compiler } from "./compiler/Compiler";
 export type { CompilerOptions, CompilerResult } from "./compiler/Compiler";
 
 // Dynamic schema generators (written to .codabra/schemas/ on each generate run)
-export { buildDynamicRouteSchema, buildDynamicModelSchema, buildDynamicViewSchema } from "./schemas/generator";
+export { buildDynamicRouteSchema, buildDynamicModelSchema, buildDynamicViewSchema } from "./schema-generators/index";
