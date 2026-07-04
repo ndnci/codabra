@@ -8,3 +8,6 @@ dist/
 .env.*.local
 .codabra/schemas*
 packages/cli/schemas/
+
+# Copied at publish time (see packages/cli/package.json prepack/postpack)
+packages/cli/README.md

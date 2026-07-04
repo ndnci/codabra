@@ -1,6 +1,6 @@
 {
     "name": "@ndnci/codabra",
-    "version": "0.1.6-alpha.1",
+    "version": "0.1.7",
     "description": "Codabra CLI — generate and orchestrate applications from config files",
     "type": "module",
     "main": "./dist/index.js",
@@ -9,11 +9,18 @@
         "codabra": "./bin/codabra.js",
         "create-codabra": "./bin/create-codabra.js"
     },
+    "files": [
+        "dist",
+        "bin",
+        "schemas"
+    ],
     "scripts": {
         "build": "tsup",
         "dev": "tsup --watch",
         "typecheck": "tsc --noEmit",
-        "clean": "rm -rf dist"
+        "clean": "rm -rf dist",
+        "prepack": "cp ../../README.md ./README.md",
+        "postpack": "rm -f ./README.md"
     },
     "dependencies": {
         "commander": "^12.0.0",
