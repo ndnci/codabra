@@ -3,6 +3,9 @@
   <p><strong>Configuration Driven Development — write JSON configs, get real apps.</strong></p>
   <p>Codabra reads config files and compiles them into production-ready applications. It works on top of frameworks — not instead of them.</p>
 
+  <a href="https://ndnci.github.io/codabra/">
+    <img alt="Documentation" src="https://img.shields.io/badge/docs-ndnci.github.io%2Fcodabra-0070f3?style=flat-square" />
+  </a>
   <a href="https://www.npmjs.com/package/@ndnci/codabra">
     <img alt="npm version" src="https://img.shields.io/npm/v/@ndnci/codabra?style=flat-square&color=0070f3" />
   </a>

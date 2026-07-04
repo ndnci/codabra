@@ -12,10 +12,10 @@ const config: Config = {
         faster: true,
     },
 
-    url: "https://codabra.dev",
-    baseUrl: "/",
+    url: "https://ndnci.github.io",
+    baseUrl: "/codabra/",
 
-    organizationName: "codabra",
+    organizationName: "ndnci",
     projectName: "codabra",
 
     onBrokenLinks: "throw",
