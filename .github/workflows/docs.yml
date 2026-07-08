@@ -2,6 +2,11 @@ name: Deploy Docs
 
 on:
     push:
+        branches: [main]
+        paths:
+            - "apps/docs/**"
+            - "packages/cli/package.json"
+            - ".github/workflows/docs.yml"
         tags:
             - "v*"
     workflow_dispatch:
@@ -17,7 +22,7 @@ permissions:
 
 jobs:
     build:
-        name: Build Docusaurus docs
+        name: Build VitePress docs
         runs-on: ubuntu-latest
 
         steps:
@@ -40,13 +45,13 @@ jobs:
             - name: Build packages (docs may import types)
               run: pnpm turbo build --filter=@ndnci/codabra
 
-            - name: Build Docusaurus
-              run: pnpm --filter=docs build
+            - name: Build VitePress
+              run: pnpm --filter=@codabra/docs build
 
             - name: Upload Pages artifact
               uses: actions/upload-pages-artifact@v3
               with:
-                  path: apps/docs/build
+                  path: apps/docs/.vitepress/dist
 
     deploy:
         name: Deploy to GitHub Pages

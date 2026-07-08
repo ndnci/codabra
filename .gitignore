@@ -3,6 +3,8 @@ dist/
 .turbo/
 *.log
 .DS_Store
+.vitepress/cache
+.vitepress/dist
 .env
 .env.local
 .env.*.local

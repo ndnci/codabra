@@ -1,5 +1,7 @@
 <div align="center">
-  <h1>🐫 Codabra</h1>
+  <img src="https://raw.githubusercontent.com/ndnci/codabra/main/assets/logo.png" alt="Codabra logo" width="120" />
+
+  <h1>🐍 Codabra</h1>
   <p><strong>Configuration Driven Development — write JSON configs, get real apps.</strong></p>
   <p>Codabra reads config files and compiles them into production-ready applications. It works on top of frameworks — not instead of them.</p>
 

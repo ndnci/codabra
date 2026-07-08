@@ -1,6 +1,6 @@
 {
     "name": "@ndnci/codabra",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "description": "Codabra CLI — generate and orchestrate applications from config files",
     "homepage": "https://ndnci.github.io/codabra/",
     "repository": {
